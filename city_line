@@ -1,0 +1,23 @@
+// ==UserScript==
+// @name         cityline retry
+// @namespace    http://tampermonkey.net/
+// @version      2024-08-14
+// @description  try to take over the world!
+// @author       You
+// @match        https://msg.cityline.com/*
+// @icon         https://www.google.com/s2/favicons?sz=64&domain=cityline.com
+// @grant        none
+// ==/UserScript==
+
+(function() {
+
+    const buttonId = 'btn-retry-en-1';
+
+    const checkButton = setInterval(() => {
+        const button = document.getElementById(buttonId);
+        if (button && !button.disabled) {
+            button.click();
+        }
+    }, 1000);
+
+})();
