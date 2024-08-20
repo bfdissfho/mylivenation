@@ -11,6 +11,8 @@
 // @match        https://www.livenation.my/show/*
 // @match        https://www.livenation.co.jp/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=livenation.hk
+// @updateURL    https://raw.githubusercontent.com/bfdissfho/mylivenation/main/refresh%20and%20buy
+// @downloadURL  https://raw.githubusercontent.com/bfdissfho/mylivenation/main/refresh%20and%20buy
 // @grant        none
 // ==/UserScript==
 
