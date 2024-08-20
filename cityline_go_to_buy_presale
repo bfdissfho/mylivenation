@@ -6,6 +6,8 @@
 // @author       You
 // @match        https://priority.cityline.com/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=cityline.com
+// @updateURL    https://raw.githubusercontent.com/bfdissfho/mylivenation/main/cityline_go_to_buy_presale
+// @downloadURL  https://raw.githubusercontent.com/bfdissfho/mylivenation/main/cityline_go_to_buy_presale
 // @grant        none
 // ==/UserScript==
 
