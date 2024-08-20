@@ -1,0 +1,27 @@
+// ==UserScript==
+// @name         cityline go to buy 
+// @namespace    http://tampermonkey.net/
+// @version      2024-08-14
+// @description  try to take over the world!
+// @author       You
+// @match        https://shows.cityline.com/*
+// @icon         https://www.google.com/s2/favicons?sz=64&domain=cityline.com
+// @grant        none
+// ==/UserScript==
+
+(function() {
+    'use strict';
+
+    function refresh_and_click_button() {
+        const button = document.getElementById('buyTicketBtn');
+        if (button) {
+            button.click();
+            clearInterval(checkButton);
+        } else {
+            location.reload();
+        }
+    }
+
+    // Set interval to check for the button
+    const checkButton = setInterval(refresh_and_click_button, 1000);
+})();
