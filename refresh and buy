@@ -1,0 +1,33 @@
+// ==UserScript==
+// @name         livenation refresh and buy ticket
+// @namespace    http://tampermonkey.net/
+// @version      2024-08-15
+// @description  try to take over the world!
+// @author       You
+// @match        https://www.livenation.hk/show/*
+// @match        https://www.livenation.sg/show/*
+// @match        https://www.livenation.com.tw/show/*
+// @match        https://www.livenationtero.co.th/show/*
+// @match        https://www.livenation.my/show/*
+// @match        https://www.livenation.co.jp/*
+// @icon         https://www.google.com/s2/favicons?sz=64&domain=livenation.hk
+// @grant        none
+// ==/UserScript==
+
+(function() {
+
+    function checkForLink() {
+        const ticketLink = document.querySelector('.eventtickets__ticket__buy--loggedin');
+        if (ticketLink) {
+
+            window.location.href = ticketLink.href;
+            clearInterval(checkButton);
+        } else {
+
+            location.reload();
+        }
+    }
+
+    const checkButton = setInterval(checkForLink, 2000);
+
+})();
