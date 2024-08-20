@@ -6,6 +6,8 @@
 // @author       You
 // @match        https://msg.cityline.com/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=cityline.com
+// @updateURL    https://raw.githubusercontent.com/bfdissfho/mylivenation/main/city_line
+// @downloadURL  https://raw.githubusercontent.com/bfdissfho/mylivenation/main/city_line
 // @grant        none
 // ==/UserScript==
 
