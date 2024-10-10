@@ -9,6 +9,11 @@
 // @match        https://msg2.cityline.com/*
 // @match        https://msg3.cityline.com/*
 // @match        https://msg4.cityline.com/*
+// @match        https://msg5.cityline.com/*
+// @match        https://msg6.cityline.com/*
+// @match        https://msg7.cityline.com/*
+// @match        https://msg8.cityline.com/*
+// @match        https://msg9.cityline.com/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=cityline.com
 // @updateURL    https://raw.githubusercontent.com/bfdissfho/mylivenation/main/city_line
 // @downloadURL  https://raw.githubusercontent.com/bfdissfho/mylivenation/main/city_line
