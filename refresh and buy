@@ -21,9 +21,9 @@
     function checkForLink() {
         const ticketLink = document.querySelector('.eventtickets__ticket__buy--loggedin');
         if (ticketLink) {
-
-            window.location.href = ticketLink.href;
             clearInterval(checkButton);
+            window.location.href = ticketLink.href;
+            
         } else {
 
             location.reload();
