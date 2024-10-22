@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         cityline retry
 // @namespace    http://tampermonkey.net/
-// @version      2024-10-10
+// @version      2024-10-22
 // @description  try to take over the world!
 // @author       You
 // @match        https://msg.cityline.com/*
@@ -30,5 +30,5 @@
             button.click();
         }
     }, 1000);
-    const a = 'a'
+    
 })();
