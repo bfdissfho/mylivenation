@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         cityline go to buy presale
 // @namespace    http://tampermonkey.net/
-// @version      2024-08-14
+// @version      2024-10-22
 // @description  try to take over the world!
 // @author       You
 // @match        https://priority.cityline.com/*
@@ -17,8 +17,9 @@
     const checkButton = setInterval(() => {
         const button = document.getElementById(buttonId);
         if (button) {
-            button.click();
             clearInterval(checkButton);
+            button.click();
+            
         }
     }, 100); // Check every second
 })();
