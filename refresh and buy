@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         livenation refresh and buy ticket
 // @namespace    http://tampermonkey.net/
-// @version      2024-08-15
+// @version      2024-10-22
 // @description  try to take over the world!
 // @author       You
 // @match        https://www.livenation.hk/show/*
