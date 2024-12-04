@@ -23,5 +23,5 @@
         } else {
             location.reload();
         }
-    }, 2000); // Check every second
+    }, 2000); // Check every second1
 })();
