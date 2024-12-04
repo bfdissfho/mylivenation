@@ -20,6 +20,8 @@
             clearInterval(checkButton);
             button.click();
             
+        } else {
+            location.reload();
         }
     }, 100); // Check every second
 })();
