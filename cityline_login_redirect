@@ -5,6 +5,8 @@
 // @description  try to take over the world!
 // @author       You
 // @match        https://www.cityline.com/zh_HK/Login.html*
+// @updateURL    https://raw.githubusercontent.com/bfdissfho/mylivenation/refs/heads/main/cityline_login_redirect
+// @downloadURL  https://raw.githubusercontent.com/bfdissfho/mylivenation/refs/heads/main/cityline_login_redirect
 // @grant        none
 // ==/UserScript==
 
