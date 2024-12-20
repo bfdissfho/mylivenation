@@ -4,18 +4,32 @@
 // @version      2024-12-19
 // @description  try to take over the world!
 // @author       You
-// @match        https://www.cityline.com/zh_HK/Login.html*
+// @match        https://www.cityline.com/*
+// @match        https://priority.cityline.com/*
+// @match        https://shows.cityline.com/*
 // @updateURL    https://raw.githubusercontent.com/bfdissfho/mylivenation/refs/heads/main/cityline_login_redirect
 // @downloadURL  https://raw.githubusercontent.com/bfdissfho/mylivenation/refs/heads/main/cityline_login_redirect
 // @grant        none
 // ==/UserScript==
 
 (function() {
-    const targetURL = 'https://www.cityline.com/zh_HK/Login.html'; // Target URL to check
 
-    if (window.location.href.includes(targetURL)) {
-        // Redirect to the desired URL
-        const redirectURL = 'http://example.com/redirect'; // Change this to your target redirect URL
-        window.location.href = 'https://shows.cityline.com/tc/2024/justlive2024.html';
+    var target_url = 'https://shows.cityline.com/tc/2024/justlive2024.html'
+
+    function aa(){
+        const login_url = 'https://www.cityline.com/zh_HK/Login.html'; // Target URL to check
+
+        if (window.location.href.includes(login_url)) {
+            window.location.href = target_url;
+        }}
+
+    function close_tab(){
+        const buy_ticket_button = document.getElementById('buyTicketBtn');
+        if (window.location.href.includes(target_url) && buy_ticket_button){
+            window.close();
+        }
     }
+    setTimeout(close_tab, 5000)
+
+    setTimeout(aa, 1000)
 })();
