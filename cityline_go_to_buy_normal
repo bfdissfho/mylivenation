@@ -26,5 +26,5 @@
     }
 
     // Set interval to check for the button
-    const checkButton = setInterval(refresh_and_click_button, 1000);
+    const checkButton = setInterval(refresh_and_click_button, 500);
 })();
