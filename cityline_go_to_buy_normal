@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         cityline go to buy normal
 // @namespace    http://tampermonkey.net/
-// @version      2024-10-22
+// @version      2025-3-19
 // @description  try to take over the world!
 // @author       You
 // @match        https://shows.cityline.com/*
