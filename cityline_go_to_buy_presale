@@ -14,14 +14,13 @@
 (function() {
     const buttonId = 'buyTicketBtn';
 
-    const checkButton = setInterval(() => {
+    function checkButton() {
         const button = document.getElementById(buttonId);
         if (button) {
             clearInterval(checkButton);
             button.click();
-            
-        } else {
-            location.reload();
         }
-    }, 500); // Check every second1
+    }
+
+    setTimeout(checkButton, 2000)
 })();
