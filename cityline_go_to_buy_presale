@@ -17,7 +17,6 @@
     function checkButton() {
         const button = document.getElementById(buttonId);
         if (button) {
-            clearInterval(checkButton);
             button.click();
         }
     }
