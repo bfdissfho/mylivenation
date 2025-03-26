@@ -27,8 +27,8 @@
     const checkButton = setInterval(() => {
         const button = document.getElementById(buttonId);
         if (button && !button.disabled) {
-            button.click();
+            console.log(3000000)
         }
-    }, 1000);
+    }, 100000);
     
 })();
