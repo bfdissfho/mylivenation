@@ -1,10 +1,11 @@
 // ==UserScript==
 // @name         cityline go to buy presale
 // @namespace    http://tampermonkey.net/
-// @version      2025-3-25
+// @version      2025-3-27
 // @description  try to take over the world!
 // @author       You
 // @match        https://priority.cityline.com/*
+// @match        https://presales.cityline.com/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=cityline.com
 // @updateURL    https://raw.githubusercontent.com/bfdissfho/mylivenation/main/cityline_go_to_buy_presale
 // @downloadURL  https://raw.githubusercontent.com/bfdissfho/mylivenation/main/cityline_go_to_buy_presale
@@ -17,9 +18,13 @@
     function checkButton() {
         const button = document.getElementById(buttonId);
         if (button) {
+            clearInterval(aa)
             button.click();
+        }
+        else{
+            location.reload();
         }
     }
 
-    setTimeout(checkButton, 2000)
+   const aa = setInterval(checkButton, 5000)
 })();
