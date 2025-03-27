@@ -12,15 +12,18 @@
 // ==/UserScript==
 
 (function() {
-    'use strict';
+    const buttonId = 'buyTicketBtn';
 
-    function refresh_and_click_button() {
-        const button = document.getElementById('buyTicketBtn');
+    function checkButton() {
+        const button = document.getElementById(buttonId);
         if (button) {
+            clearInterval(aa)
             button.click();
-            
+        }
+        else{
+            location.reload();
         }
     }
-    setTimeout(refresh_and_click_button, 2000)
 
+   const aa = setInterval(checkButton, 5000)
 })();
