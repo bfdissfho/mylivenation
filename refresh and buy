@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         livenation refresh and buy ticket
 // @namespace    http://tampermonkey.net/
-// @version      2024-10-22
+// @version      2025-4-3
 // @description  try to take over the world!
 // @author       You
 // @match        https://www.livenation.hk/show/*
@@ -10,6 +10,7 @@
 // @match        https://www.livenationtero.co.th/show/*
 // @match        https://www.livenation.my/show/*
 // @match        https://www.livenation.co.jp/*
+// @match        https://music.priceless.com/en/concerts/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=livenation.hk
 // @updateURL    https://raw.githubusercontent.com/bfdissfho/mylivenation/main/refresh%20and%20buy
 // @downloadURL  https://raw.githubusercontent.com/bfdissfho/mylivenation/main/refresh%20and%20buy
@@ -20,10 +21,15 @@
 
     function checkForLink() {
         const ticketLink = document.querySelector('.eventtickets__ticket__buy--loggedin');
-        if (ticketLink) {
+        const button = document.querySelector('a[data-testid="aedp-ticket-action-button-or-status"]');
+        if (ticketLink || button) {
             clearInterval(checkButton);
-            window.location.href = ticketLink.href;
-            
+            if (ticketLink) {
+                window.location.href = ticketLink.href;
+            }
+            if (button) {
+                window.location.href = button.href;
+            }
         } else {
 
             location.reload();
