@@ -25,5 +25,5 @@
         }
     }
 
-   const aa = setInterval(checkButton, 5000)
+   const aa = setInterval(checkButton, 1000)
 })();
