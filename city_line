@@ -4,16 +4,16 @@
 // @version      2025-06-04
 // @description  try to take over the world!
 // @author       You
-// @match        https://msg.cityline.com/*
-// @match        https://msg1.cityline.com/*
-// @match        https://msg2.cityline.com/*
-// @match        https://msg3.cityline.com/*
-// @match        https://msg4.cityline.com/*
-// @match        https://msg5.cityline.com/*
-// @match        https://msg6.cityline.com/*
-// @match        https://msg7.cityline.com/*
-// @match        https://msg8.cityline.com/*
-// @match        https://msg9.cityline.com/*
+// @match        https://msg.cityline.co/*
+// @match        https://msg1.cityline.co/*
+// @match        https://msg2.cityline.co/*
+// @match        https://msg3.cityline.co/*
+// @match        https://msg4.cityline.co/*
+// @match        https://msg5.cityline.co/*
+// @match        https://msg6.cityline.co/*
+// @match        https://msg7.cityline.co/*
+// @match        https://msg8.cityline.co/*
+// @match        https://msg9.cityline.co/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=cityline.com
 // @updateURL    https://raw.githubusercontent.com/bfdissfho/mylivenation/main/city_line
 // @downloadURL  https://raw.githubusercontent.com/bfdissfho/mylivenation/main/city_line
@@ -27,8 +27,8 @@
     const checkButton = setInterval(() => {
         const button = document.getElementById(buttonId);
         if (button && !button.disabled) {
-            button.click()
+            //button.click()
         }
-    }, 2000);
+    }, 200000);
     
 })();
