@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         cityline go to buy presale
 // @namespace    http://tampermonkey.net/
-// @version      2025-06-04
+// @version      2026-03-10
 // @description  try to take over the world!
 // @author       You
 // @match        https://priority.cityline.com/*
@@ -13,18 +13,33 @@
 // ==/UserScript==
 
 (function() {
+    'use strict';
+
     const buttonId = 'buyTicketBtn';
+    let isWaiting = false; // 增加一個狀態鎖，防止重複觸發
 
     function checkButton() {
         const button = document.getElementById(buttonId);
-        if (button) {
-            clearInterval(aa)
-            button.click();
-        }
-        else{
-            location.reload();
+
+        // 如果找到按鈕，且目前沒有在等待延遲中
+        if (button && !isWaiting) {
+            isWaiting = true; // 鎖定狀態
+            console.log('找到按鈕！將在 2 秒後執行點擊...');
+
+            // 停止每秒檢查的計時器
+            clearInterval(aa);
+
+            // 延遲 2000 毫秒 (2秒) 執行點擊
+            setTimeout(function() {
+                button.click();
+                console.log('已執行點擊');
+            }, 2000);
+
+        } else if (!button) {
+            console.log('尚未發現按鈕，持續監測中...');
         }
     }
 
-   const aa = setInterval(checkButton, 1000)
+    // 每 1000 毫秒 (1秒) 檢查一次
+    const aa = setInterval(checkButton, 1000);
 })();
