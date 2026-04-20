@@ -5,6 +5,8 @@
 // @description  123
 // @author       GeminiUser
 // @match        https://hkt.hkticketing.com/hant/*
+// @updateURL    https://raw.githubusercontent.com/bfdissfho/mylivenation/refs/heads/main/HK_Ticketing
+// @downloadURL  https://raw.githubusercontent.com/bfdissfho/mylivenation/refs/heads/main/HK_Ticketing
 // @grant        none
 // ==/UserScript==
 
