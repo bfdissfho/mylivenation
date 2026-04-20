@@ -1,0 +1,352 @@
+// ==UserScript==
+// @name         HK Ticketing
+// @namespace    http://tampermonkey.net/
+// @version      19.1
+// @description  123
+// @author       GeminiUser
+// @match        https://hkt.hkticketing.com/hant/*
+// @grant        none
+// ==/UserScript==
+
+(function() {
+    'use strict';
+
+    // =========================================================================
+    // 🔴 設定區域 (USER CONFIG)
+    // =========================================================================
+
+    const TARGET_QUANTITY = 4;
+    const PRIVILEGE_CODE = "";
+
+    const TARGETS = [
+        {
+            date: "7月10日",
+            tickets: ["D/", "A/", "C/", "B/"]
+        },
+        {
+            date: "7月11日",
+            tickets: ["D/", "A/", "C/", "B/"]
+        }
+    ];
+
+    // =========================================================================
+    // 🟢 參數調整區
+    // =========================================================================
+    const MAIN_INTERVAL = 500;
+    const FAST_INTERVAL = 100;
+    const DATE_CYCLE_DELAY = 2000;
+    const PAGE_LOAD_TIMEOUT = 7000;
+    const DATE_TO_TICKET_DELAY = 1000;
+    const QUANTITY_STUCK_TIMEOUT = 1500;
+
+    // 同意條款後等待分配座位的時間 (毫秒)
+    const AGREE_TO_ALLOCATE_DELAY = 1000;
+
+    // =========================================================================
+    // 🟡 內部狀態變數
+    // =========================================================================
+    let isDateSelected = false;
+    let selectedTargetConfig = null;
+    let hasClickedTicket = false;
+    let hasClickedNext = false;
+    let currentTargetIndex = 0;
+    let lastDateRetryTime = 0;
+    let ticketClickStartTime = 0;
+    let dateClickTime = 0;
+    let lastScreenQty = 0;
+    let lastQtyChangeTime = Date.now();
+
+    let agreeTermsTime = 0;
+    let hasClickedAllocate = false;
+
+    let pageLoadStartTime = Date.now();
+    let lastUrl = window.location.href;
+
+    // ============================================================
+    // 🏎️ 引擎 1：加速循環 (100ms) - 專注按加號
+    // ============================================================
+    setInterval(() => {
+        if (window.location.href.includes("selectTicket")) {
+            if (!document.querySelector('.mz-modal') && !document.querySelector('.baxia-dialog-close')) {
+                let currentQty = getCurrentQuantity();
+                if (currentQty < TARGET_QUANTITY && !hasClickedNext) {
+                    let plusBtn = findPlusButton();
+                    if (plusBtn) {
+                        plusBtn.click();
+                    }
+                }
+            }
+        }
+    }, FAST_INTERVAL);
+
+    // ============================================================
+    // 🚜 引擎 2：主循環 (500ms) - 核心邏輯
+    // ============================================================
+    setInterval(() => {
+        let currentUrl = window.location.href;
+        let now = Date.now();
+
+        // --- 0. SPA 網址變更檢測 ---
+        if (currentUrl !== lastUrl) {
+            console.log(">>> 網址變更，重置計時器！");
+            lastUrl = currentUrl;
+            pageLoadStartTime = now;
+            ticketClickStartTime = 0;
+            dateClickTime = 0;
+            lastScreenQty = 0;
+            lastQtyChangeTime = now;
+
+            if (!currentUrl.includes("selectTicket")) {
+                 isDateSelected = false;
+                 hasClickedTicket = false;
+                 selectedTargetConfig = null;
+                 currentTargetIndex = 0;
+                 hasClickedNext = false;
+            }
+            if (!currentUrl.includes("confirmOrder")) {
+                 agreeTermsTime = 0;
+                 hasClickedAllocate = false;
+            }
+        }
+
+        // --- 共用：Baxia 阻擋與 Punish 處理 ---
+        let baxiaClose = document.querySelector('.baxia-dialog-close');
+        if (baxiaClose) {
+            baxiaClose.click();
+            let baxiaDialog = document.querySelector('.baxia-dialog');
+            if(baxiaDialog) baxiaDialog.remove();
+            let baxiaMask = document.querySelector('.baxia-dialog-mask');
+            if(baxiaMask) baxiaMask.remove();
+            return;
+        }
+
+        let punishTag = document.querySelector('punish-component');
+        let punishDiv = document.getElementById('baxia-punish');
+        if (punishTag || punishDiv) {
+            if (punishTag) punishTag.remove();
+            if (punishDiv) punishDiv.remove();
+        }
+
+        // ============================================================
+        // 🎫 階段 A：選票頁邏輯 (selectTicket)
+        // ============================================================
+        if (currentUrl.includes("selectTicket")) {
+
+            let modal = document.querySelector('.mz-modal');
+            if (modal) {
+                let codeInput = modal.querySelector('input[name="privilegeCode"]');
+                let confirmBtn = modal.querySelector('.mz-modal-footer .bui-btn-primary');
+                if (codeInput && confirmBtn) {
+                    if (PRIVILEGE_CODE && codeInput.value !== PRIVILEGE_CODE) {
+                        let nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set;
+                        nativeInputValueSetter.call(codeInput, PRIVILEGE_CODE);
+                        codeInput.dispatchEvent(new Event('input', { bubbles: true }));
+                        codeInput.dispatchEvent(new Event('change', { bubbles: true }));
+                    } else {
+                        confirmBtn.click();
+                        return;
+                    }
+                }
+            }
+
+            let seatMapElement = findElementByText("span", "座位圖");
+            if (!seatMapElement) {
+                if (now - pageLoadStartTime > PAGE_LOAD_TIMEOUT) {
+                    window.location.reload();
+                    return;
+                }
+            }
+            else {
+                if (!isDateSelected) {
+                    if (currentTargetIndex >= TARGETS.length) currentTargetIndex = 0;
+                    let currentTarget = TARGETS[currentTargetIndex];
+                    let dateText = currentTarget.date;
+                    let dateEl = findDateElement(dateText);
+
+                    if (dateEl) {
+                        let notAvailableSign = dateEl.querySelector('.sign___gTvXe');
+                        if (notAvailableSign && notAvailableSign.innerText.includes("暫無可售")) {
+                            if (now - lastDateRetryTime > DATE_CYCLE_DELAY) {
+                                let parentDiv = dateEl.closest('.sessionList___al29_');
+                                if(parentDiv) parentDiv.click(); else dateEl.click();
+                                lastDateRetryTime = now;
+                                currentTargetIndex++;
+                            }
+                        } else {
+                            let parentDiv = dateEl.closest('.sessionList___al29_');
+                            if(parentDiv) parentDiv.click(); else dateEl.click();
+                            isDateSelected = true;
+                            selectedTargetConfig = currentTarget;
+                            dateClickTime = now;
+                            lastQtyChangeTime = now;
+                            lastScreenQty = 0;
+                        }
+                    } else {
+                        currentTargetIndex++;
+                    }
+                    return;
+                }
+
+                if (isDateSelected && selectedTargetConfig) {
+                    if (now - dateClickTime < DATE_TO_TICKET_DELAY) return;
+
+                    let plusBtn = findPlusButton();
+                    if (!plusBtn) {
+                        if (!hasClickedTicket) {
+                            let desiredTickets = selectedTargetConfig.tickets;
+                            let ticketElements = document.querySelectorAll('.ticketInfoContainer___dLjRV');
+                            for (let el of ticketElements) {
+                                let ticketName = el.innerText;
+                                let isMatch = desiredTickets.includes("Any") || desiredTickets.some(cat => ticketName.includes(cat));
+                                let isTicketSoldOut = el.querySelector('.sign___gTvXe') && el.innerText.includes("暫無可售");
+
+                                if (isMatch && !isTicketSoldOut) {
+                                    let parentRow = el.closest('.levelItem___rPZ55');
+                                    if (parentRow) {
+                                        parentRow.click();
+                                        hasClickedTicket = true;
+                                        ticketClickStartTime = now;
+                                        lastQtyChangeTime = now;
+                                        lastScreenQty = 0;
+                                        return;
+                                    }
+                                }
+                            }
+                        } else {
+                            if (now - ticketClickStartTime > PAGE_LOAD_TIMEOUT && !document.querySelector('.mz-modal')) {
+                                window.location.reload();
+                            }
+                        }
+                    }
+                }
+
+                let screenQty = getCurrentQuantity();
+                if (screenQty !== lastScreenQty) {
+                    lastScreenQty = screenQty;
+                    lastQtyChangeTime = now;
+                }
+                let isMaxCapped = (screenQty > 0 && (now - lastQtyChangeTime > QUANTITY_STUCK_TIMEOUT));
+
+                if (screenQty >= TARGET_QUANTITY || isMaxCapped) {
+                    let nextBtns = document.querySelectorAll('button.mz-button');
+                    for (let btn of nextBtns) {
+                        if (btn.innerText.includes("下一步") && !btn.disabled) {
+                            btn.click();
+                            hasClickedNext = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        // ============================================================
+        // 🛒 階段 B：確認訂單頁邏輯 (confirmOrder)
+        // ============================================================
+        else if (currentUrl.includes("confirmOrder")) {
+
+            let agreeBox = document.querySelector('.agreement-checkbox');
+
+            if (agreeBox) {
+                let useTag = agreeBox.querySelector('use');
+                let svgHref = useTag ? useTag.getAttribute('xlink:href') : '';
+
+                let isUnchecked = svgHref.includes('weixuanzhong');
+                let isChecked = svgHref.includes('xuanzhong') && !svgHref.includes('weixuanzhong');
+
+                // === 情況 1：未勾選 -> 執行精準打擊 ===
+                if (isUnchecked) {
+                    console.log(">>> 發現未勾選，執行精準打擊...");
+
+                    // 尋找內層 Icon
+                    let iconSpan = agreeBox.querySelector('.agreementIcon___l58tx') || agreeBox.querySelector('span[role="img"]');
+                    let clickTarget = iconSpan ? iconSpan : agreeBox;
+
+                    // 送出完整的點擊事件流
+                    clickTarget.click();
+                    clickTarget.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true, view: window }));
+                    clickTarget.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, cancelable: true, view: window }));
+                    clickTarget.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));
+
+                    // 結束這回合，等下一個 0.5 秒再回來檢查是否變成了 isChecked
+                }
+
+                // === 情況 2：畫面真實顯示已勾選！ ===
+                else if (isChecked) {
+
+                    // 如果是第一次發現打勾，立刻記錄時間
+                    if (agreeTermsTime === 0) {
+                        console.log("✅ 確認已打勾，開始倒數 1 秒...");
+                        agreeTermsTime = now;
+                    }
+
+                    // 嚴格確認「從畫面顯示已勾選」起，有沒有過 1 秒 (套用新版修正邏輯)
+                    if (now - agreeTermsTime >= AGREE_TO_ALLOCATE_DELAY && !hasClickedAllocate) {
+                        let allocateBtns = document.querySelectorAll('button.mz-button');
+                        for (let btn of allocateBtns) {
+                            let btnText = btn.innerText.trim();
+
+                            // 同時判斷「分配座位」或「分配區域」，甚至直接抓包含「分配」的按鈕
+                            if ((btnText.includes("分配座位") || btnText.includes("分配區域")) && !btn.disabled) {
+                                console.log("🚀 確定已打勾滿 1 秒，點擊「" + btnText + "」！");
+
+                                // 強化點擊：模擬真實滑鼠按下與放開，避免 React 擋掉單純的 .click()
+                                btn.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true, view: window }));
+                                btn.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, cancelable: true, view: window }));
+                                btn.click();
+
+                                hasClickedAllocate = true;
+                                break; // 點到就跳出迴圈
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+    }, MAIN_INTERVAL);
+
+    // =========================================================================
+    // 🔵 輔助函數
+    // =========================================================================
+
+    function getCurrentQuantity() {
+        let container = document.querySelector('.buyNum___a5xrK');
+        if (container) {
+            let spans = container.querySelectorAll('span');
+            for (let s of spans) {
+                let text = s.innerText.trim();
+                if (/^\d+$/.test(text)) return parseInt(text);
+            }
+        }
+        return 0;
+    }
+
+    function findDateElement(dateText) {
+        let dateElements = document.querySelectorAll('.eventCaption___LUOTP');
+        for (let el of dateElements) {
+            if (dateText === "Any" && el.innerText.trim().length > 0) return el;
+            if (el.innerText.includes(dateText)) return el;
+        }
+        return null;
+    }
+
+    function findPlusButton() {
+        let uses = document.querySelectorAll('use');
+        for (let u of uses) {
+            let href = u.getAttribute('xlink:href');
+            if (href && href.includes('#icon-jia') && !href.includes('jian')) {
+                return u.closest('span[role="img"]');
+            }
+        }
+        return null;
+    }
+
+    function findElementByText(tag, text) {
+        let elements = document.getElementsByTagName(tag);
+        for (let i = 0; i < elements.length; i++) {
+            if (elements[i].textContent.includes(text)) return elements[i];
+        }
+        return null;
+    }
+
+})();
